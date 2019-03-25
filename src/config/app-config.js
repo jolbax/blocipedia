@@ -9,7 +9,7 @@ module.exports = {
   init(app, express) {
     app.set("views", viewsFolder);
     app.set("view engine", "ejs");
-    if(process.env.NODE_ENV !== "prod"){
+    if(process.env.NODE_ENV !== "production"){
       const logger = require("morgan");
       app.use(logger("dev"));
     }
