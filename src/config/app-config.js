@@ -2,7 +2,6 @@ require("dotenv").config();
 const path = require("path");
 const bodyParse = require("body-parser");
 const flash = require("express-flash");
-const logger = require("morgan");
 const session = require("express-session");
 const viewsFolder = path.join(__dirname, "..", "views");
 
@@ -10,7 +9,10 @@ module.exports = {
   init(app, express) {
     app.set("views", viewsFolder);
     app.set("view engine", "ejs");
-    app.use(logger("dev"));
+    if(process.env.NODE_ENV !== "prod"){
+      const logger = require("morgan");
+      app.use(logger("dev"));
+    }
     app.use(bodyParse.urlencoded({extended: true}));
     app.use(session({
       secret: process.env.cookieSecret,
