@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <% include ./partials/head.ejs %>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <% include ./partials/navbar.ejs %>
+    <!-- Page Content -->
+    <main class="container">
+        <% include ../static/partials/messages.ejs %>
+        <header class="jumbotron my-4">
+          <h1 class="display-3">Just another Wiki...</h1>
+          <p class="lead">Create, collaborate and share!</p>
+          <a href="/users/sign_up" class="btn btn-outline-dark btn-lg">Sign up</a>
+        </header>
+
+        <section class="row text-center">
+          <section class="col-lg-4">
+            <img style="width: 10rem;" src="http://getskeleton.com/images/pens.svg" alt="" class="card-img-top">
+            <h4 class="card-title">Create</h4>
+            <p class="card-text">New public and private wikis</p>
+          </section>
+          <section class="col-lg-4">
+            <img style="width: 10rem;" src="http://getskeleton.com/images/watch.svg" alt="" class="card-img-top">
+            <h4 class="card-title">Collaborate</h4>
+            <p class="card-text">Work with other users on the same wiki</p>
+          </section>
+          <section class="col-lg-4">
+            <img style="width: 10rem;" src="http://getskeleton.com/images/feather.svg" alt="" class="card-img-top">
+            <h4 class="card-title">Share</h4>
+            <p class="card-text">Invite users to your private wikis</p>
+          </section>
+        </section>
+
+      </main>
+      <% include ./partials/baseScripts.ejs %>
+</body>
+</html>

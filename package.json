@@ -4,6 +4,7 @@
   "description": "A Node.JS based Wikipedia clone",
   "main": "src/server.js",
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "dotenv": "^7.0.0",

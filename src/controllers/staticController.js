@@ -1,5 +1,5 @@
 module.exports = {
   index(req, res, next) {
-    res.send("hello world");
+    res.render("static/index");
   }
 }
