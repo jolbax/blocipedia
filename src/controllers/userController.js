@@ -1,5 +1,6 @@
-const userQueries = require("../db/queries.user.js");
+const passport = require("passport");
 const mailer = require("../auth/mailHelper");
+const userQueries = require("../db/queries.user.js");
 
 module.exports = {
   singUp(req, res, next) {
@@ -33,5 +34,23 @@ module.exports = {
         }
       }
     });
+  },
+  logIn(req, res, next) {
+    passport.authenticate("local", {
+      failureRedirect: "/",
+      failureFlash: true
+    })(req, res, () => {
+      if (!req.user) {
+        req.flash("notice", "Log in failed. Please try again.");
+      } else {
+        req.flash("notice", " You've successfully logged in!");
+      }
+      res.redirect("/");
+    });
+  },
+  logOut(req, res, next) {
+    req.logout();
+    req.flash("notice", "You've successfully logged out!");
+    res.redirect("/");
   }
 };

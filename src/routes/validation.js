@@ -1,7 +1,7 @@
 const { check, validationResult } = require("express-validator/check");
 
 userChecks = [
-  check("username", "must be at least 3 chars long").isLength({ min: 3 }),
+  check("username", "must be at least 3 chars long").isLength({ min: 3 }).optional(),
   check("email", "must be valid").isEmail(),
   check("password", "must be at least 6 chars long").isLength({ min: 6 }),
   check("passwordConfirmation", "must match password provided")

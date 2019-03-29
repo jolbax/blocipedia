@@ -10,7 +10,30 @@
           <li class="nav-item">
             <a class="nav-link" href="/">Home</a>
           </li>
+          <% if(currentUser) { %>
+          <li class="nav-item">
+              <a class="nav-link" data-toggle="modal" data-target="#logOutModalCenter">
+                Log Out
+              </a>
+          </li>
+            <% } else { %>
+          <li class="nav-item">
+              <a class="nav-link" data-toggle="modal" data-target="#logInModalCenter">
+                Log In
+              </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/users/sign_up">Sign Up</a>
+          </li>
+          <% }%>
         </ul>
       </div>
   </nav>
+
+  <% if(currentUser) { %>
+    <%  include ../../users/log_out_modal.ejs %>
+  <% } else { %>
+      <%  include ../../users/log_in_modal.ejs %>
+  <% } %>
+
 </div>
