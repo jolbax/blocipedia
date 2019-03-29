@@ -1,15 +1,13 @@
+const jwt = require("jsonwebtoken");
 const mailer = require("../auth/mailHelper");
 const passport = require("passport");
 const userQueries = require("../db/queries.user.js");
 
 module.exports = {
-  singUp(req, res, next) {
-    res.render("users/sign_up");
-  },
   create(req, res, next) {
     let newUser = {
-      username: req.body.username.toLowerCase(),
-      email: req.body.email.toLowerCase(),
+      username: req.body.username ? req.body.username.toLowerCase():null,
+      email: req.body.email ? req.body.email.toLowerCase():null,
       password: req.body.password,
       passwordConfirmation: req.body.passwordConfirmation
     };
@@ -35,22 +33,19 @@ module.exports = {
       }
     });
   },
-  logIn(req, res, next) {
-    passport.authenticate("local", {
-      failureRedirect: "/",
-      failureFlash: true
-    })(req, res, () => {
-      if (!req.user) {
-        req.flash("notice", "Log in failed. Please try again.");
-      } else {
-        req.flash("notice", " You've successfully logged in!");
+  apiLogin(req, res, next) {
+    if (!req.body.email || !req.body.password) {
+      return res.status(400).json({
+        message: "Something is not right with your input"
+      });
+    }
+
+    passport.authenticate('local', { session: false })(req, res, (err) => {
+      if (err) {
+        res.status(500).json({ err });
       }
-      res.redirect("/");
+      const token = jwt.sign({ id: req.user.id, email: req.user.email }, process.env.jwtSecret);
+      return res.status(200).json({ user: req.user.username, token });
     });
-  },
-  logOut(req, res, next) {
-    req.logout();
-    req.flash("notice", "You've successfully logged out!");
-    res.redirect("/");
   }
 };
