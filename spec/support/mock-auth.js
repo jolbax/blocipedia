@@ -14,7 +14,7 @@ module.exports = {
           role: role
         };
         res.locals.currentUser = req.user;
-      } else if (id == 0) {
+      } else if (id === 0) {
         delete req.user;
       }
 

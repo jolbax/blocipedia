@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <% include ../static/partials/head.ejs %>
+</head>
+
+<body>
+
+  <% include ../static/partials/navbar.ejs %>
+
+
+  <main class="container">
+    <% include ../static/partials/messages.ejs %>
+    <div class="d-flex align-items-center justify-content-between p-3 my-3 text-white-50 rounded shadow-sm" style="background-color: #6b6b6b;">
+      <div class="lh-100">
+        <h2 class="mb-0 text-white lh-100">Public Wikis</h2>
+      </div>
+    <% if(currentUser) { %>
+      <a href="/wikis/new" class="btn btn-outline-light">Add Wiki</a>
+    <% } %>
+    </div>
+
+
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+      <h6 class="border-bottom border-gray pb-2 mb-0">Recently created</h6>
+      <% if(wikis) { %>
+        <% wikis.forEach((wiki) => { %>
+          <div class="media text-muted pt-3">
+            <img data-src="holder.js/32x32?theme=industrial&text=Pub" alt="" class="mr-2 rounded">
+            <p class="media-body pb-3 mb-0 lh-125 border-bottom border-gray">
+              <strong class="d-block small text-gray-dark">@<%= wiki.User.username %></strong>
+              <a href="/wikis/<%= wiki.id %>"> <%= wiki.title %> </a>
+            </p>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </main>
+
+  <% include ../static/partials/baseScripts.ejs %>
+
+</body>
+
+</html>

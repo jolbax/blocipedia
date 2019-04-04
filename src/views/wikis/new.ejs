@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <% include ../static/partials/head.ejs %>
+</head>
+
+<body>
+
+  <% include ../static/partials/navbar.ejs %>
+
+
+  <main class="container">
+    <% include ../static/partials/messages.ejs %>
+    <div class="d-flex align-items-center justify-content-between p-3 my-3 text-white-50 rounded shadow-sm"
+      style="background-color: #6b6b6b;">
+      <div class="lh-100">
+        <h2 class="mb-0 text-white lh-100">New Wiki</h2>
+      </div>
+    </div>
+    <form action="/wikis/create" method="POST">
+      <div class="form-group">
+        <label for="InputEmail1">Title</label>
+        <input type="text" class="form-control" name="title" id="wikiTitel" aria-describedby="wikiHelp"
+          placeholder="Title">
+        <small id="wikiHelp" class="form-text text-muted">The title cannot be empty.</small>
+      </div>
+      <div class="form-group">
+        <label for="InputPassword1">Text</label>
+        <textarea class="form-control" name="body" id="wikiBody" rows="5" placeholder="Text"></textarea>
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" name="private" value="true" id="privateCheck">
+        <input type="hidden" name="private" id="hiddenPrivateCheck" value="false">
+        <label class="form-check-label" for="privateCheck">Private</label>
+      </div>
+      <button type="submit" class="btn btn-dark">Submit</button>
+      <a href="/wikis/" class="btn btn-dark">Cancel</a>
+    </form>
+  </main>
+
+  <% include ../static/partials/baseScripts.ejs %>
+
+</body>
+
+</html>

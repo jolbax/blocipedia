@@ -41,16 +41,16 @@ module.exports = {
       failureFlash: true
     })(req, res, () => {
       if (!req.user) {
-        req.flash("notice", "Log in failed. Please try again.");
+        req.flash("error", "Log in failed. Please try again.");
       } else {
         req.flash("notice", " You've successfully logged in!");
       }
-      res.redirect("/");
+      res.redirect(req.headers.referer);
     });
   },
   logOut(req, res, next) {
     req.logout();
     req.flash("notice", "You've successfully logged out!");
-    res.redirect("/");
+    res.redirect(req.headers.referer);
   }
 };

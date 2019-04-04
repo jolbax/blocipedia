@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <% include ../static/partials/head.ejs %>
+</head>
+
+<body>
+
+  <% include ../static/partials/navbar.ejs %>
+
+
+  <main class="container">
+    <% include ../static/partials/messages.ejs %>
+    <div class="d-flex align-items-center justify-content-between p-3 my-3 text-white-50 rounded shadow-sm"
+      style="background-color: #dfdfdf;">
+      <div class="lh-100">
+        <h2 class="mb-0 lh-100"><%= wiki.title %></h2>
+      </div>
+      <% if(currentUser) { %>
+      <div>
+        <a href="<%= `/wikis/${wiki.id}/edit` %>" class="btn btn-outline-dark">Edit</a>
+        <a href="<%= `/wikis/${wiki.id}/delete` %>" class="btn btn-outline-danger">Delete</a>
+      </div>
+      <% } %>
+    </div>
+    <p><%= wiki.body %></p>
+  </main>
+
+  <% include ../static/partials/baseScripts.ejs %>
+
+</body>
+
+</html>
