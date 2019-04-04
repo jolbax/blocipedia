@@ -27,6 +27,9 @@ module.exports = {
       res.redirect("/");
     } else {
       return Wiki.findByPk(req.params.id).then(wiki => {
+        if(!wiki){
+          callback("Wiki not found");
+        }
         wiki
           .destroy()
           .then(res => {
@@ -52,6 +55,9 @@ module.exports = {
   getWiki(id, callback) {
     return Wiki.findByPk(id, { include: [{ model: User }] })
       .then(wiki => {
+        if(!wiki) {
+          callback("Wiki not found");
+        }
         callback(null, wiki);
       })
       .catch(err => {
@@ -69,6 +75,9 @@ module.exports = {
         private: req.body.private
       };
       return Wiki.findByPk(req.params.id).then(wiki => {
+        if(!wiki) {
+          callback("Wiki not found");
+        }
         wiki
           .update(updatedWiki, { fields: Object.keys(updatedWiki) })
           .then(() => {
