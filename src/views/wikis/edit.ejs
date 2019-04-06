@@ -30,12 +30,7 @@
         <textarea class="form-control" name="body" id="wikiBody" rows="5" placeholder="Text"><%= wiki.body %></textarea>
       </div>
       <div class="form-group form-check">
-        <% if(wiki.private) { %>
           <input type="checkbox" class="form-check-input" name="private" id="privateCheck" value="true" <%= wiki.private ? "checked":"" %> >
-          <input type="hidden" name="private" id="hiddenPrivateCheck" value="false" >
-        <% } else { %>
-          <input type="checkbox" class="form-check-input" name="private" id="privateCheck" value="true" <%= wiki.private ? "checked":"" %> >
-        <% } %>
         <label class="form-check-label" for="privateCheck">Private</label>
       </div>
       <button type="submit" class="btn btn-dark">Submit</button>

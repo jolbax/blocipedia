@@ -19,6 +19,9 @@
                 Log Out
               </a>
           </li>
+          <li class="nav-item" style="background-color: #6b6b6b;">
+                <a class="nav-link text-white" href="/users/profile"><%= currentUser.username %></a>
+          </li>
             <% } else { %>
           <li class="nav-item">
               <a class="nav-link" data-toggle="modal" data-target="#logInModalCenter">

@@ -14,7 +14,7 @@
     <% include ../static/partials/messages.ejs %>
     <div class="d-flex align-items-center justify-content-between p-3 my-3 text-white-50 rounded shadow-sm" style="background-color: #6b6b6b;">
       <div class="lh-100">
-        <h2 class="mb-0 text-white lh-100">Public Wikis</h2>
+        <h4 class="mb-0 text-white lh-100">Public Wikis</h4>
       </div>
     <% if(currentUser) { %>
       <a href="/wikis/new" class="btn btn-outline-light">Add Wiki</a>
@@ -26,6 +26,7 @@
       <h6 class="border-bottom border-gray pb-2 mb-0">Recently created</h6>
       <% if(wikis) { %>
         <% wikis.forEach((wiki) => { %>
+          <% if(!wiki.private) { %>
           <div class="media text-muted pt-3">
             <img data-src="holder.js/32x32?theme=industrial&text=Pub" alt="" class="mr-2 rounded">
             <p class="media-body pb-3 mb-0 lh-125 border-bottom border-gray">
@@ -33,8 +34,34 @@
               <a href="/wikis/<%= wiki.id %>"> <%= wiki.title %> </a>
             </p>
           </div>
+        <% } %>
         <% }) %>
       <% } %>
+    </div>
+
+    <% if(currentUser && (currentUser.role === 1 || currentUser.role === 10)) { %>
+    <div class="d-flex align-items-center justify-content-between p-3 my-3 text-white-50 rounded shadow-sm"
+      style="background-color: #6b6b6b;">
+      <div class="lh-100">
+        <h4 class="mb-0 text-white lh-100">Private Wikis</h4>
+      </div>
+    </div>
+
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+      <h6 class="border-bottom border-gray pb-2 mb-0">Recently created</h6>
+      <% wikis.forEach((wiki) => { %>
+        <% if(wiki.private && (currentUser.id === wiki.userId || currentUser.role === 10)) { %>
+      <div class="media text-muted pt-3">
+        <img data-src="holder.js/32x32?theme=industrial&text=Priv" alt="" class="mr-2 rounded">
+        <p class="media-body pb-3 mb-0 lh-125 border-bottom border-gray">
+          <strong class="d-block small text-gray-dark">@<%= wiki.User.username %></strong>
+          <strong class="d-block small text-gray-dark">private</strong>
+          <a href="/wikis/<%= wiki.id %>"> <%= wiki.title %> </a>
+        </p>
+      </div>
+        <% } %>
+      <% }) %>
+    <% } %>
     </div>
   </main>
 

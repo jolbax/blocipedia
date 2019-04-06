@@ -32,6 +32,7 @@ describe("User", () => {
           expect(user.id).not.toBeNull();
           expect(user.username).toBe("trinity");
           expect(user.email).toBe("trinity@matrix.net");
+          expect(user.role).toBe(0);
           done();
         })
         .catch(err => {
