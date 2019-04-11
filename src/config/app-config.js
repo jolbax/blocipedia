@@ -1,5 +1,5 @@
 require("dotenv").config();
-const bodyParse = require("body-parser");
+const bodyParser = require("body-parser");
 const flash = require("express-flash");
 const passportConfig = require("./passport-config");
 const path = require("path");
@@ -10,11 +10,15 @@ module.exports = {
   init(app, express) {
     app.set("views", viewsFolder);
     app.set("view engine", "ejs");
-    if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test" ) {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.NODE_ENV !== "test"
+    ) {
       const logger = require("morgan");
       app.use(logger("dev"));
     }
-    app.use(bodyParse.urlencoded({ extended: true }));
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
     app.use(
       session({
         secret: process.env.cookieSecret,
