@@ -14,7 +14,11 @@
         <header class="jumbotron my-4">
           <h1 class="display-3">Just another Wiki...</h1>
           <p class="lead">Create, collaborate and share!</p>
+          <% if(currentUser) { %>
+          <a href="/wikis" class="btn btn-outline-dark btn-lg">Create a Wiki</a>
+          <% } else { %>
           <a href="/users/sign_up" class="btn btn-outline-dark btn-lg">Sign up</a>
+          <% } %>
         </header>
 
         <section class="row text-center">

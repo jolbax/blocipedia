@@ -1,22 +1,44 @@
-<% if(messages.error || messages.notice) { %>
+<% if(messages.error || messages.notice || messages.info) { %>
 
-<div class="alert alert-<%= messages.error ? 'danger' : 'warning' %> alert-dismissible fade show" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-<% if(messages.error) { %>
-  Validation errors:
-  <ul>
-    <% messages.error.forEach((err) => { %>
-    <% if(err.param && err.msg) { %>
-      <li><%= `${err.param} ${err.msg}` %></li>
-    <% } else { %>
-      <li><%= `${err}` %></li>
-      <% } %>
-    <% }) %>
-  </ul>
-<% } else { %>
-  <p><%= messages.notice %></p>
-<% } %>
-</div>
+    <% if (messages.info) { %>
+      <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <ul>
+        <% messages.info.forEach((info) => { %>
+          <li><%= info %></li>
+        <% }) %>
+        <ul>
+      </div>
+    <% } %>
+    <% if (messages.notice) { %>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <ul>
+        <% messages.notice.forEach((notice) => { %>
+          <li><%= notice %></li>
+        <% }) %>
+        <ul>
+      </div>
+    <% } %>
+    <% if(messages.error) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        Validation errors:
+        <ul>
+      <% messages.error.forEach((err) => { %>
+        <% if(err.param && err.msg) { %>
+          <li><%= `${err.param} ${err.msg}` %></li>
+        <% } else { %>
+          <li><%= `${err}` %></li>
+        <% } %>
+      <% }) %>
+        </ul>
+       </div>
+    <% } %>
 <% } %>

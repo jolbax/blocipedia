@@ -1,0 +1,68 @@
+<!-- <script src="https://checkout.stripe.com/checkout.js"></script>
+
+<button class="btn btn-md btn-outline-primary" id="checkoutButton">Upgrade</button>
+
+<script>
+  var handler = StripeCheckout.configure({
+    key: '<%= process.env.STRIPE_PUBLISHABLE_KEY %>',
+    image: 'http://icons.iconarchive.com/icons/iconsmind/outline/128/Feather-icon.png',
+    locale: 'auto',
+    token: function (token, args) {
+
+      // You can access the token ID with `token.id`.
+      // Get the token ID to your server-side code for use.
+    }
+  });
+
+  document.getElementById('checkoutButton').addEventListener('click', function (e) {
+    // Open Checkout with further options:
+    handler.open({
+      name: 'Wikis',
+      description: 'Premium Account Checkout',
+      currency: 'usd',
+      amount: 1500,
+      panelLabel: "Subscribe ",
+      allowRememberMe: false
+    });
+    e.preventDefault();
+  });
+
+  // Close Checkout on page navigation:
+  window.addEventListener('popstate', function () {
+    handler.close();
+  });
+</script> -->
+
+<form action="/users/payment/charge" method="post">
+  <noscript>You must <a href="http://www.enable-javascript.com" target="_blank">enable JavaScript</a> in your web
+    browser in order to pay via Stripe.</noscript>
+
+  <input class="btn btn-md btn-outline-primary" type="submit" value="Upgrade" data-key="<%= process.env.STRIPE_PUBLISHABLE_KEY %>" data-amount="1500" data-currency="usd"
+    data-name="Wikix" data-panel-label="Pay subscription: " data-description="Premium Account Upgrade" data-image='http://icons.iconarchive.com/icons/iconsmind/outline/128/Feather-icon.png' />
+
+  <script src="https://checkout.stripe.com/v2/checkout.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+  <script>
+    $(document).ready(function () {
+      $(':submit').on('click', function (event) {
+        event.preventDefault();
+        var $button = $(this);
+        var $form = $button.parents('form');
+        var opts = $.extend({}, $button.data(), {
+          token: function (result) {
+            $form.append($('<input>').attr({ type: 'hidden', name: 'stripeToken', value: result.id })).submit();
+          }
+        });
+        StripeCheckout.open(opts);
+      });
+    });
+  </script>
+</form>
+
+<!-- <form action="/users/payment/charge" method="POST">
+  <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button"
+    data-key="<%= process.env.STRIPE_PUBLISHABLE_KEY %>" data-amount="999" data-name="Jolubax"
+    data-description="Widget" data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+    data-locale="auto" data-currency="chf">
+    </script>
+</form> -->
