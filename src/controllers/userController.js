@@ -98,11 +98,17 @@ module.exports = {
   },
   edit(req, res, next) {
     userQueries.getUser(req.user.id, (err, user) => {
+      const authorized = new Authorizer(req.user, user).edit();
       if (err) {
         req.flash(err.type, err.message);
         res.redirect("/");
       } else {
-        res.render("users/edit", { user });
+        if (!authorized) {
+          req.flash("error", "You are not authorized to do that");
+          res.redirect("/");
+        } else {
+          res.render("users/edit", { user });
+        }
       }
     });
   },

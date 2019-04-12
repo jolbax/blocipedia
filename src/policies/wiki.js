@@ -11,16 +11,16 @@ module.exports = class WikiPolicy extends ApplicationPolicy {
     return this.record && this.newPublic();
   }
   updatePublic(updatedRecord) {
-    return (updatedRecord.hasOwnProperty('private') ? !updatedRecord.private : true) && this.editPublic();
+    if (updatedRecord.hasOwnProperty("private") && updatedRecord.private == 'true') {
+      return (super.new() && this.record && (super._isAdmin() || (super._isPremiumUser() && super._isOwner())));
+    }
+    return this.editPublic();
   }
   destroyPublic() {
-    return this.editPublic() && super._isOwner();
+    return this.editPublic() && (super._isOwner() || super._isAdmin());
   }
   newPrivate() {
-    return (
-      super.new() &&
-      (super._isAdmin() || super._isPremiumUser())
-    );
+    return super.new() && (super._isAdmin() || super._isPremiumUser());
   }
   editPrivate() {
     return (
@@ -35,7 +35,10 @@ module.exports = class WikiPolicy extends ApplicationPolicy {
   destroyPrivate() {
     return this.updatePrivate();
   }
-  showPrivate(){
-    return this.record && ((super._isPremiumUser() && super._isOwner()) || super._isAdmin());
+  showPrivate() {
+    return (
+      this.record &&
+      ((super._isPremiumUser() && super._isOwner()) || super._isAdmin())
+    );
   }
 };

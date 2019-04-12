@@ -108,7 +108,6 @@ module.exports = {
           authorized = new Authorizer(req.user, wiki).updatePrivate();
         } else {
           authorized = new Authorizer(req.user, wiki).updatePublic(updatedWiki) ;
-
         }
 
         if (!authorized) {

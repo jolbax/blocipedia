@@ -528,7 +528,7 @@ describe("routes : wikis", () => {
     });
 
     describe("POST /wikis/:id/update", () => {
-      it("should update the private wiki associated with the ID", done => {
+      it("should update the private wiki associated with the ID (no private attribute)", done => {
         Wiki.create({
           title: "Follow the white rabbit",
           body: "But first of all, you have to find it",
@@ -555,6 +555,44 @@ describe("routes : wikis", () => {
                   "The rabbit is white.. follow it!"
                 );
                 expect(wiki.body).toContain("It is in the lady's shoulder");
+                done();
+              })
+              .catch(err => {
+                console.log(err);
+                done();
+              });
+          });
+        });
+      });
+
+      it("should update the private wiki associated with the ID (with private attribute)", done => {
+        Wiki.create({
+          title: "Follow the white rabbit",
+          body: "But first of all, you have to find it",
+          private: true,
+          userId: this.premiumUser.id
+        }).then(wiki => {
+          let options = {
+            url: `${base}/${wiki.id}/update`,
+            form: {
+              title: "The rabbit is white.. follow it!",
+              body: "It is in the lady's shoulder",
+              private: false
+            }
+          };
+          request.post(options, (err, res, body) => {
+            expect(err).toBeNull();
+            Wiki.findOne({
+              where: {
+                title: "The rabbit is white.. follow it!"
+              }
+            })
+              .then(wiki => {
+                expect(wiki.title).toContain(
+                  "The rabbit is white.. follow it!"
+                );
+                expect(wiki.body).toContain("It is in the lady's shoulder");
+                expect(wiki.private).toBe(false);
                 done();
               })
               .catch(err => {
@@ -701,6 +739,251 @@ describe("routes : wikis", () => {
             });
           }
         );
+      });
+    });
+  });
+
+  // Admin user context
+  describe("Admin account context", () => {
+    this.adminUser;
+    this.privateWiki;
+    beforeEach(done => {
+      User.create({
+        username: "cipher",
+        email: "cipher@matrix.net",
+        password: "password",
+        role: 10
+      }).then(user => {
+        this.adminUser = user;
+        Wiki.create({
+          title: "Learning Kung-Fu",
+          body: "With a Sony MiniDisc",
+          private: true,
+          userId: this.adminUser.id
+        }).then(privateWiki => {
+          this.privateWiki = privateWiki;
+          let options = {
+            url: "http://localhost:3000/auth/fake",
+            form: {
+              email: this.adminUser.email,
+              userId: this.adminUser.id,
+              role: this.adminUser.role
+            }
+          };
+          request.get(options, (err, res, body) => {
+            done();
+          });
+        });
+      });
+    });
+
+    describe("POST /wikis/create", () => {
+      it("should create a new private wiki", done => {
+        let options = {
+          url: `${base}/create`,
+          form: {
+            title: "Sentinels",
+            body: "Crazy machines!",
+            private: true,
+            userId: this.adminUser.id
+          }
+        };
+        request.post(options, (err, res, body) => {
+          expect(err).toBeNull();
+          Wiki.findOne({
+            where: {
+              title: "Sentinels"
+            }
+          })
+            .then(wiki => {
+              expect(wiki.title).toContain("Sentinels");
+              expect(wiki.body).toContain("Crazy machines!");
+              done();
+            })
+            .catch(err => {
+              console.log(err);
+              done();
+            });
+        });
+      });
+    });
+
+    describe("POST /wikis/:id/update", () => {
+      it("should update the private wiki associated with the ID (no private attribute)", done => {
+        Wiki.create({
+          title: "Follow the white rabbit",
+          body: "But first of all, you have to find it",
+          private: true,
+          userId: this.adminUser.id
+        }).then(wiki => {
+          let options = {
+            url: `${base}/${wiki.id}/update`,
+            form: {
+              title: "The rabbit is white.. follow it!",
+              body: "It is in the lady's shoulder",
+              private: true
+            }
+          };
+          request.post(options, (err, res, body) => {
+            expect(err).toBeNull();
+            Wiki.findOne({
+              where: {
+                title: "The rabbit is white.. follow it!"
+              }
+            })
+              .then(wiki => {
+                expect(wiki.title).toContain(
+                  "The rabbit is white.. follow it!"
+                );
+                expect(wiki.body).toContain("It is in the lady's shoulder");
+                done();
+              })
+              .catch(err => {
+                console.log(err);
+                done();
+              });
+          });
+        });
+      });
+
+      it("should update the private wiki associated with the ID (with private attribute)", done => {
+        Wiki.create({
+          title: "Follow the white rabbit",
+          body: "But first of all, you have to find it",
+          private: true,
+          userId: this.adminUser.id
+        }).then(wiki => {
+          let options = {
+            url: `${base}/${wiki.id}/update`,
+            form: {
+              title: "The rabbit is white.. follow it!",
+              body: "It is in the lady's shoulder",
+              private: false
+            }
+          };
+          request.post(options, (err, res, body) => {
+            expect(err).toBeNull();
+            Wiki.findOne({
+              where: {
+                title: "The rabbit is white.. follow it!"
+              }
+            })
+              .then(wiki => {
+                expect(wiki.title).toContain(
+                  "The rabbit is white.. follow it!"
+                );
+                expect(wiki.body).toContain("It is in the lady's shoulder");
+                expect(wiki.private).toBe(false);
+                done();
+              })
+              .catch(err => {
+                console.log(err);
+                done();
+              });
+          });
+        });
+      });
+
+      it("should update a private wiki own by other premium user", done => {
+        User.create({
+          username: "oracle",
+          email: "oracle@matrix.net",
+          password: "password",
+          role: 1
+        }).then(newUser => {
+          Wiki.create({
+            title: "Follow the white rabbit",
+            body: "But first of all, you have to find it",
+            private: true,
+            userId: newUser.id
+          }).then(wiki => {
+            let options = {
+              url: `${base}/${wiki.id}/update`,
+              form: {
+                title: "The rabbit is white.. follow it!",
+                body: "It is in the lady's shoulder",
+                private: true
+              }
+            };
+            request.post(options, (err, res, body) => {
+              expect(err).toBeNull();
+              Wiki.findOne({
+                where: {
+                  title: "The rabbit is white.. follow it!"
+                }
+              })
+                .then(wiki => {
+                  expect(wiki.title).toContain(
+                    "The rabbit is white.. follow it!"
+                  );
+                  expect(wiki.body).toContain("It is in the lady's shoulder");
+                  expect(wiki.private).toBe(true);
+                  done();
+                })
+                .catch(err => {
+                  console.log(err);
+                  done();
+                });
+            });
+          });
+        });
+      });
+    });
+
+    describe("GET /wikis/:id/delete", () => {
+      it("should delete the private wiki associated with the specific user", done => {
+        let wikisCountBeforeDelete;
+        Wiki.findAll().then(wikis => {
+          wikisCountBeforeDelete = wikis.length;
+          request.get(
+            `${base}/${this.privateWiki.id}/delete`,
+            (err, res, body) => {
+              expect(err).toBeNull();
+              Wiki.findAll()
+                .then(wikis => {
+                  expect(wikis.length).toBe(wikisCountBeforeDelete - 1);
+                  done();
+                })
+                .catch(err => {
+                  console.log(err);
+                  done();
+                });
+            }
+          );
+        });
+      });
+
+      it("should not delete a wiki owned by another user", done => {
+        User.create({
+          username: "oracle",
+          email: "oracle@matrix.net",
+          password: "password",
+          role: 1
+        }).then(newUser => {
+          Wiki.create({
+            title: "Follow the white rabbit",
+            body: "But first of all, you have to find it",
+            private: true,
+            userId: newUser.id
+          }).then(wiki => {
+            let wikisCountBeforeDelete;
+            Wiki.findAll().then(wikis => {
+              wikisCountBeforeDelete = wikis.length;
+              request.get(`${base}/${wiki.id}/delete`, (err, res, body) => {
+                expect(err).toBeNull();
+                Wiki.findAll()
+                  .then(wikis => {
+                    expect(wikis.length).toBe(wikisCountBeforeDelete - 1);
+                    done();
+                  })
+                  .catch(err => {
+                    console.log(err);
+                    done();
+                  });
+              });
+            });
+          });
+        });
       });
     });
   });

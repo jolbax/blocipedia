@@ -1,127 +1,165 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <% include ../static/partials/head.ejs %>
+  </head>
 
-<head>
-  <% include ../static/partials/head.ejs %>
-</head>
+  <body>
+    <% include ../static/partials/navbar.ejs %>
+    <% let isPremium = user.role === 1 %>
+    <% let isAdmin = user.role === 10 %>
 
-<body>
-
-  <% include ../static/partials/navbar.ejs %>
-  <% let isPremium = user.role === 1 %>
-  <% let isAdmin = user.role === 10 %>
-
-  <hr>
-  <main class="container">
-    <% include ../static/partials/messages.ejs %>
-    <div class="row">
-      <div class="col-sm-10">
-        <h2><%= isPremium ? `Premium User Account: ${user.username}`:`Standard User Account: ${user.username}` %>
-        </h2>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-3">
-        <!--left col-->
-
-
-        <div class="text-center">
-          <br>
-          <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail"
-            alt="avatar">
-          <!-- <h6>Upload a different photo...</h6>
-          <input type="file" class="text-center center-block file-upload"> -->
+    <hr />
+    <main class="container">
+      <% include ../static/partials/messages.ejs %>
+      <div class="row">
+        <div class="col-sm-10">
+          <h2><%= isPremium ? `Premium User Account: ${user.username}`: isAdmin ? `Admin User Account ${user.username}`:`Standard User Account: ${user.username}` %></h2>
         </div>
-        </hr><br>
-
-
-        <ul class="list-group">
-          <li class="list-group-item text-muted">Activity <i class="fa fa-dashboard fa-1x"></i></li>
-          <li class="list-group-item text-right"><span class="pull-left"><strong>Public Wikis</strong></span>
-            <%= user.wikis.length %></li>
-          <% if(isPremium) {%>
-          <li class="list-group-item text-right"><span class="pull-left"><strong>Private Wikis</strong></span> 37</li>
-          <li class="list-group-item text-right"><span class="pull-left"><strong>Shares</strong></span> 78</li>
-          <% } %>
-        </ul>
-
       </div>
-      <!--/col-3-->
-      <div class="col-sm-9">
-        <div class="tab-content">
-          <div class="tab-pane active" id="home">
-            <hr>
-            <form class="form" action="/users/profile/pwreset" method="post" id="registrationForm">
-            <div class="form-group">
+      <div class="row">
+        <div class="col-sm-3">
+          <!--left col-->
 
-              <div class="col-xs-6">
-                <label for="username">
-                  <h4>User name</h4>
-                </label>
-                <input type="text" class="form-control" name="username" id="username" placeholder="<%= user.username %>"
-                  title="enter your first name if any." style=" background: white; border-color: white" disabled>
-              </div>
-            </div>
-            <div class="form-group">
-
-              <div class="col-xs-6">
-                <label for="email">
-                  <h4>Email</h4>
-                </label>
-                <input type="email" class="form-control" name="email" id="email" placeholder="<%= user.email %>"
-                  title="enter your email." style=" background: white; border-color: white" disabled>
-              </div>
-            </div>
-            <div class="form-group">
-
-              <div class="col-xs-6">
-                <label for="membership">
-                  <h4>Account Type</h4>
-                </label>
-                <input type="membership" class="form-control" name="membership" id="membership"
-                  placeholder="<%= user.role === 0 ? "Standard": user.role === 1 ? "Premium":user.role === 10 ? "Admin":"Unknown" %>"
-                  title="enter your membership." style=" background: white; border-color: white" disabled>
-              </div>
-            </div>
-              <div class="form-group">
-
-                <div class="col-xs-6">
-                  <label for="password">
-                    <h4>Password</h4>
-                  </label>
-                  <input type="password" class="form-control" name="password" id="password" placeholder="password"
-                    title="enter your password.">
-                </div>
-              </div>
-              <div class="form-group">
-
-                <div class="col-xs-6">
-                  <label for="passwordConfirmation">
-                    <h4>Verify</h4>
-                  </label>
-                  <input type="password" class="form-control" name="passwordConfirmation" id="passwordConfirmation" placeholder="passwordConfirmation"
-                    title="enter your password confirmation.">
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="col-xs-12">
-                  <br>
-                  <button class="btn btn-md btn-dark" type="submit">Submit</button>
-                  <a class="btn btn-md btn-outline-secondary" href="/users/profile">Cancel</a>
-                </div>
-              </div>
-            </form>
-
-            <hr>
-
+          <div class="text-center">
+            <br />
+            <img
+              src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png"
+              class="avatar img-circle img-thumbnail"
+              alt="avatar"
+            />
+            <!-- <h6>Upload a different photo...</h6>
+          <input type="file" class="text-center center-block file-upload"> -->
           </div>
-      </div>
-      <!--/tab-content-->
+          <br />
 
-    </div>
-    <!--/col-9-->
-  </main>
-  <!--/row-->
+          <ul class="list-group">
+            <li class="list-group-item text-muted">
+              Activity <i class="fa fa-dashboard fa-1x"></i>
+            </li>
+            <li class="list-group-item text-right">
+              <span class="pull-left"><strong>Public Wikis</strong></span> <%= user.getPublicWikis() ? user.getPublicWikis().length : "0" %>
+            </li>
+            <% if(isPremium || isAdmin) {%>
+            <li class="list-group-item text-right">
+              <span class="pull-left"><strong>Private Wikis</strong></span> <%= user.getPublicWikis() ? user.getPrivateWikis().length : "0" %>
+            </li>
+            <li class="list-group-item text-right">
+              <span class="pull-left"><strong>Shares</strong></span> 78
+            </li>
+            <% } %>
+          </ul>
+        </div>
+        <!--/col-3-->
+        <div class="col-sm-9">
+          <div class="tab-content">
+            <div class="tab-pane active" id="home">
+              <hr />
+              <form
+                class="form"
+                action="/users/profile/pwreset"
+                method="post"
+                id="registrationForm"
+              >
+                <div class="form-group">
+                  <div class="col-xs-6">
+                    <label for="username">
+                      <h4>User name</h4>
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="username"
+                      id="username"
+                      placeholder="<%= user.username %>"
+                      title="enter your first name if any."
+                      style=" background: white; border-color: white"
+                      disabled
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-6">
+                    <label for="email">
+                      <h4>Email</h4>
+                    </label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      name="email"
+                      id="email"
+                      placeholder="<%= user.email %>"
+                      title="enter your email."
+                      style=" background: white; border-color: white"
+                      disabled
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-6">
+                    <label for="membership">
+                      <h4>Account Type</h4>
+                    </label>
+                    <input type="membership" class="form-control"
+                    name="membership" id="membership"
+                    placeholder="<%= user.role === 0 ? "Standard": user.role === 1 ? "Premium":user.role === 10 ? "Admin":"Unknown" %>"
+                    title="enter your membership." style=" background: white; border-color: white"
+                    disabled>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-6">
+                    <label for="password">
+                      <h4>Password</h4>
+                    </label>
+                    <input
+                      type="password"
+                      class="form-control"
+                      name="password"
+                      id="password"
+                      placeholder="password"
+                      title="enter your password."
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-6">
+                    <label for="passwordConfirmation">
+                      <h4>Verify</h4>
+                    </label>
+                    <input
+                      type="password"
+                      class="form-control"
+                      name="passwordConfirmation"
+                      id="passwordConfirmation"
+                      placeholder="passwordConfirmation"
+                      title="enter your password confirmation."
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-12">
+                    <br />
+                    <button class="btn btn-md btn-dark" type="submit">
+                      Submit
+                    </button>
+                    <a
+                      class="btn btn-md btn-outline-secondary"
+                      href="/users/profile"
+                      >Cancel</a
+                    >
+                  </div>
+                </div>
+              </form>
+              <hr />
+            </div>
+          </div>
+        </div>
+        <!--/tab-content-->
+      </div>
+      <!--/col-9-->
+    </main>
+    <!--/row-->
     <% include ../static/partials/baseScripts.ejs %>
-</body>
+  </body>
 </html>

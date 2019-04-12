@@ -15,7 +15,7 @@
     <% include ../static/partials/messages.ejs %>
     <div class="row">
       <div class="col-sm-10">
-        <h2><%= isPremium ? `Premium User Account: ${user.username}`:`Standard User Account: ${user.username}` %></h2>
+        <h2><%= isPremium ? `Premium User Account: ${user.username}`: isAdmin ? `Admin User Account ${user.username}`:`Standard User Account: ${user.username}` %></h2>
       </div>
     </div>
     <div class="row">
@@ -36,7 +36,7 @@
         <ul class="list-group">
           <li class="list-group-item text-muted">Activity <i class="fa fa-dashboard fa-1x"></i></li>
           <li class="list-group-item text-right"><span class="pull-left"><strong>Public Wikis</strong></span> <%= user.getPublicWikis() ? user.getPublicWikis().length : "0" %></li>
-          <% if(isPremium) {%>
+          <% if(isPremium || isAdmin) {%>
           <li class="list-group-item text-right"><span class="pull-left"><strong>Private Wikis</strong></span> <%= user.getPublicWikis() ? user.getPrivateWikis().length : "0" %></li>
           <li class="list-group-item text-right"><span class="pull-left"><strong>Shares</strong></span> 78</li>
           <% } %>
@@ -82,11 +82,29 @@
               <br>
               <a class="btn btn-md btn-dark mr-1" href="/users/profile/edit"><i class="glyphicon glyphicon-ok-sign"></i>
                 Reset password</a>
-            <% if(!isPremium) { %>
+            <% if(!isPremium && !isAdmin) { %>
               <% include ./stripe/checkout.ejs %>
-            <% } else { %>
-              <a class="btn btn-md btn-outline-warning" href="/users/profile/downgrade"><i class="glyphicon glyphicon-ok-sign"></i>
-                    Downgrade</a>
+            <% } else if(isPremium && !isAdmin) { %>
+              <button class="btn btn-md btn-outline-warning" data-toggle="modal" data-target="#downgradeModal">
+                Downgrade
+              </button>
+              <div class="modal fade" id="downgradeModal" tabindex="-1" role="dialog" aria-labelledby="downgradeModalTitle"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="downgradeModalTitle">All your private wikis will become public.%></h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <a href="/users/profile/downgrade" class="btn btn-outline-danger">Confirm Downgrade</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             <% } %>
             </div>
 
