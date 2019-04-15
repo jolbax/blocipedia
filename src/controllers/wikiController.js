@@ -1,3 +1,4 @@
+const md = require("markdown-it")();
 const wikiQueries = require("../db/queries.wiki.js");
 const Authorizer = require("../policies/wiki");
 
@@ -72,7 +73,7 @@ module.exports = {
             res.redirect("/wikis");
           }
         }
-        res.render("wikis/show", { wiki });
+        res.render("wikis/show", { wiki, md });
       }
     });
   },

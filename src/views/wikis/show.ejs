@@ -24,7 +24,9 @@
       </div>
       <% } %>
     </div>
-    <p><%= wiki.body %></p>
+    <div class="px-3">
+      <%- md.render(wiki.body) %>
+    </div>
   </main>
 
   <% include ../static/partials/baseScripts.ejs %>

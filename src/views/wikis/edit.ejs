@@ -17,9 +17,9 @@
           <h2 class="mb-0 text-white lh-100"><%= wiki.title %></h2>
         </div>
       </div>
-      <form action="<%= `/wikis/${wiki.id}/update` %>" method="POST">
-        <div class="form-group">
-          <label for="InputEmail1">Title</label>
+      <form class="py-3 " action="<%= `/wikis/${wiki.id}/update` %>" method="POST">
+        <div class="form-group mx-3">
+          <label for="wikiTitel">Title</label>
           <input
             type="text"
             class="form-control"
@@ -33,14 +33,32 @@
             >The title cannot be empty.</small
           >
         </div>
-        <div class="form-group">
-          <label for="InputPassword1">Text</label>
-          <textarea
-            class="form-control"
-            name="body"
-            id="wikiBody"
-            rows="5"
-            placeholder="Text"><%= wiki.body %></textarea>
+        <div class="form-group d-flex flex-md-row flex-column justify-content-md-around align-items-center" style="max-height: 1000px">
+          <div class="mx-3 my-3" style="min-width: 250px; width: 450px; height: 300px;">
+            <label for="wikiBody">Text</label>
+            <textarea class="form-control h-100 mw-100"
+              name="body"
+              id="wikiBody"
+              oninput="this.editor.update()"
+              ><%= wiki.body %></textarea>
+          </div>
+          <div class="mx-3 my-3" style="min-width: 250px; width: 450px; height: 300px;">
+            <label for="preview">Preview</label>
+            <div class="bg-light px-3 overflow-auto border rounded h-100 mw-100" id="preview"> </div>
+          </div>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.4.2/markdown-it.min.js"></script>
+          <script>
+            function Editor(input, preview) {
+              var md = window.markdownit();
+              this.update = function () {
+                preview.innerHTML = md.render(input.value);
+              };
+              input.editor = this;
+              this.update();
+            }
+            var $ = function (id) { return document.getElementById(id); };
+            new Editor($("wikiBody"), $("preview"));
+          </script>
         </div>
         <% if(currentUser && ((currentUser.role == 1 && currentUser.id === wiki.userId) || currentUser.role == 10)) { %>
         <div class="form-group custom-control custom-switch">
@@ -49,8 +67,10 @@
         </div>
         <br>
         <% } %>
-        <button type="submit" class="btn btn-dark">Submit</button>
-        <a href="<%= `/wikis/${wiki.id}` %>" class="btn btn-dark">Cancel</a>
+        <div class="px-3 pt-5">
+          <button type="submit" class="btn btn-dark">Submit</button>
+          <a href="<%= `/wikis/${wiki.id}` %>" class="btn btn-dark">Cancel</a>
+        </div>
       </form>
     </main>
 
