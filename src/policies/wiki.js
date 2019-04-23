@@ -26,19 +26,23 @@ module.exports = class WikiPolicy extends ApplicationPolicy {
     return (
       super.new() &&
       this.record &&
-      (super._isAdmin() || (super._isPremiumUser() && super._isOwner()))
+      (super._isAdmin() || (super._isPremiumUser() && super._isOwner()) || super._isCollaborator())
     );
   }
   updatePrivate() {
     return this.editPrivate();
   }
   destroyPrivate() {
-    return this.updatePrivate();
+    return (
+      super.new() &&
+      this.record &&
+      (super._isAdmin() || (super._isPremiumUser() && super._isOwner()))
+    );
   }
   showPrivate() {
     return (
       this.record &&
-      ((super._isPremiumUser() && super._isOwner()) || super._isAdmin())
+      ((super._isPremiumUser() && super._isOwner()) || super._isAdmin() || super._isCollaborator())
     );
   }
 };

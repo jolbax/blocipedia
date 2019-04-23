@@ -8,7 +8,7 @@
 <body>
 
   <% include ../static/partials/navbar.ejs %>
-
+  <% const isCollaborator = wiki.collaborators.filter(collaborator => collaborator.userId == currentUser.id).length === 1 %>
 
   <main class="container">
     <% include ../static/partials/messages.ejs %>
@@ -20,7 +20,12 @@
       <% if(currentUser) { %>
       <div>
         <a href="<%= `/wikis/${wiki.id}/edit` %>" class="btn btn-outline-dark">Edit</a>
+        <% if(wiki.private && (wiki.userId == currentUser.id)) { %>
+        <a href="<%= `/wikis/${wiki.id}/collaborator` %>" class="btn btn-outline-primary">Collaborators</a>
+        <% } %>
+        <% if(!isCollaborator) {%>
         <a href="<%= `/wikis/${wiki.id}/delete` %>" class="btn btn-outline-danger">Delete</a>
+        <% } %>
       </div>
       <% } %>
     </div>

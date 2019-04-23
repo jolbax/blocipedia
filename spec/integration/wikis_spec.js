@@ -53,7 +53,7 @@ describe("routes : wikis", () => {
     describe("GET /wikis", () => {
       it("should render a list with all public wikis", done => {
         request.get(`${base}`, (err, res, body) => {
-          expect(body).toContain("Public Wikis");
+          expect(body).toContain("Public and Shared Wikis");
           expect(body).toContain("How old is Mr. Smith");
           done();
         });
@@ -194,7 +194,7 @@ describe("routes : wikis", () => {
     describe("GET /wikis", () => {
       it("should render a list with all public wikis", done => {
         request.get(`${base}`, (err, res, body) => {
-          expect(body).toContain("Public Wikis");
+          expect(body).toContain("Public and Shared Wikis");
           expect(body).toContain("How old is Mr. Smith");
           expect(body).toContain("Add Wiki");
           done();

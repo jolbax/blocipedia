@@ -9,6 +9,7 @@
 
     <main class="container">
       <% include ../static/partials/messages.ejs %>
+      <% const isCollaborator = wiki.collaborators.filter(collaborator => collaborator.userId === currentUser.id).length === 1 %>
       <div
         class="d-flex align-items-center justify-content-between p-3 my-3 text-white-50 rounded shadow-sm"
         style="background-color: #d6d6d6;"
@@ -60,8 +61,8 @@
             new Editor($("wikiBody"), $("preview"));
           </script>
         </div>
-        <% if(currentUser && ((currentUser.role == 1 && currentUser.id === wiki.userId) || currentUser.role == 10)) { %>
-        <div class="form-group custom-control custom-switch">
+        <% if(currentUser && ((currentUser.role == 1 && currentUser.id === wiki.userId) || currentUser.role == 10 || isCollaborator)) { %>
+        <div class="form-group custom-control custom-switch <%= isCollaborator ? "invisible": ""%>">
           <input type="checkbox" class="custom-control-input" id="privateCheck" name="private" value="true" <%= wiki.private ? "checked":"" %>>
           <label class="custom-control-label" for="privateCheck">Private</label>
         </div>

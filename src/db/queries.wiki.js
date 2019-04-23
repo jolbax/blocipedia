@@ -1,6 +1,5 @@
 const Authorizer = require("../policies/wiki");
-const User = require("../../src/db/models").User;
-const Wiki = require("../../src/db/models").Wiki;
+const { Collaborator, User, Wiki } = require("../../src/db/models");
 
 module.exports = {
   createWiki(req, callback) {
@@ -11,7 +10,10 @@ module.exports = {
       if (req.body.private === true) {
         const authorized = new Authorizer(req.user).newPrivate();
         if (!authorized) {
-          return callback({ type: "notice", message: "This is a premium feature. Please upgrade your account." })
+          return callback({
+            type: "notice",
+            message: "This is a premium feature. Please upgrade your account."
+          });
         }
       }
       return Wiki.create({
@@ -39,16 +41,19 @@ module.exports = {
           callback({ type: "error", message: "Wiki was not found" });
         }
 
+        const authorizer = new Authorizer(req.user, wiki);
         let authorized;
-        if(wiki.private) {
-          authorized = new Authorizer(req.user, wiki).destroyPrivate();
-
+        if (wiki.private) {
+          authorized = authorizer.destroyPrivate();
         } else {
-          authorized = new Authorizer(req.user, wiki).destroyPublic();
+          authorized = authorizer.destroyPublic();
         }
 
         if (!authorized) {
-          callback({type: "notice", message: "You are not authorized to do that"});
+          callback({
+            type: "notice",
+            message: "You are not authorized to do that"
+          });
         } else {
           wiki
             .destroy()
@@ -57,7 +62,7 @@ module.exports = {
             })
             .catch(err => {
               console.log(err);
-              callback({type: "error", message: err});
+              callback({ type: "error", message: err });
             });
         }
       });
@@ -65,7 +70,7 @@ module.exports = {
   },
   getAllWikis(callback) {
     return Wiki.findAll({
-      include: [{ model: User }]
+      include: [{ model: User }, { model: Collaborator, as: "collaborators" }]
     })
       .then(wikis => {
         callback(null, wikis);
@@ -76,10 +81,12 @@ module.exports = {
       });
   },
   getWiki(id, callback) {
-    return Wiki.findByPk(id, { include: [{ model: User }] })
+    return Wiki.findByPk(id, {
+      include: [{ model: Collaborator, as: "collaborators" }]
+    })
       .then(wiki => {
         if (!wiki) {
-          callback({type: "error", message: "Wiki was not found"});
+          callback({ type: "error", message: "Wiki was not found" });
         }
         callback(null, wiki);
       })
@@ -98,20 +105,32 @@ module.exports = {
         body: req.body.body,
         private: req.body.private || false
       };
-      return Wiki.findByPk(req.params.id).then(wiki => {
+      return Wiki.findByPk(req.params.id, {
+        include: [{ model: Collaborator, as: "collaborators" }]
+      }).then(wiki => {
         if (!wiki) {
           callback({ type: "error", message: "Wiki was not found" });
         }
 
+        const authorizer = new Authorizer(req.user, wiki);
         let authorized;
-        if(wiki.private){
-          authorized = new Authorizer(req.user, wiki).updatePrivate();
+        if (wiki.private) {
+          authorized = authorizer.updatePrivate();
+          if (
+            authorizer._isCollaborator() &&
+            (!req.body.private || req.body.private == "false")
+          ) {
+            authorized = false;
+          }
         } else {
-          authorized = new Authorizer(req.user, wiki).updatePublic(updatedWiki) ;
+          authorized = authorizer.updatePublic(updatedWiki);
         }
 
         if (!authorized) {
-          callback({ type: "notice", message: "You are not authorized to do that" });
+          callback({
+            type: "notice",
+            message: "You are not authorized to do that"
+          });
         } else {
           wiki
             .update(updatedWiki, { fields: Object.keys(updatedWiki) })

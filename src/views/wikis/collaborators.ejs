@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../static/partials/head.ejs %>
+  </head>
+
+  <body>
+    <% include ../static/partials/navbar.ejs %>
+
+    <main class="container">
+      <% include ../static/partials/messages.ejs %> <% if(currentUser) { %>
+      <div
+        class="d-flex align-items-center justify-content-between p-3 my-3 text-white-50 rounded shadow-sm"
+        style="background-color: #000000;"
+      >
+        <div class="lh-100">
+          <h4 class="mb-0 text-white lh-100"><%= `Collaborators of "${wiki.title}"`%></h4>
+        </div>
+      </div>
+
+      <div>
+        <table class="table table-responsive-md mx-auto my-5" style="width: 60vw">
+        <thead class="thead-light">
+            <tr>
+              <th scope="col">Username</th>
+              <th scope="col">Email</th>
+              <th scope="col">Add Collaborators</th>
+            </tr>
+          </thead>
+          <tbody>
+          <% users.forEach(user => { %>
+            <% if( user.id === currentUser.id) return %>
+            <% if( wiki.collaborators.filter(collaborator => collaborator.userId === user.id ).length == 1 ) { %>
+            <tr>
+              <td><%= `@${user.username}`%></td>
+              <td><%= `${user.email}`%></td>
+              <td>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" data-wiki-id="<%=`${wiki.id}`%>" data-collaborator-id="<%=`${user.id}`%>" id="<%=`${user.username}Collaborator`%>" name="<%=`${user.id}Collaborator`%>" value="true" checked>
+                  <label class="custom-control-label" for="<%=`${user.username}Collaborator`%>"></label>
+                </div>
+              </td>
+            </tr>
+            <% } else {  %>
+            <tr>
+              <td><%= `@${user.username}`%></td>
+              <td><%= `${user.email}`%></td>
+              <td>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" data-wiki-id="<%=`${wiki.id}`%>" data-collaborator-id="<%=`${user.id}`%>" id="<%=`${user.username}Collaborator`%>" name="<%=`${user.id}Collaborator`%>" value="true">
+                  <label class="custom-control-label" for="<%=`${user.username}Collaborator`%>"></label>
+                </div>
+              </td>
+            </tr>
+            <% } %>
+          <% })%>
+          </tbody>
+        </table>
+        <% } %>
+
+        <a href="<%= `/wikis/${wiki.id}` %>" class="btn btn-dark">Back</a>
+      </div>
+    </main>
+
+    <script>
+      const dongles = document.querySelectorAll('.custom-control-input');
+      var init = {
+        method: 'GET',
+        credentials: 'same-origin' // This makes sure that the session is carried with
+      };
+
+      function handleAddAndRemoveCollaborator() {
+        if(this.checked) {
+          let createUrl = `/wikis/${this.dataset.wikiId}/collaborator/${this.dataset.collaboratorId}/create`;
+          fetch(createUrl, init).then(data => {
+            if(data.ok){
+              console.log(data.body);
+              return;
+            }
+            console.log(data.log);
+          }).catch(err => console.log(`Error: ${err}`));
+        } else {
+          let destroyUrl = `/wikis/${this.dataset.wikiId}/collaborator/${this.dataset.collaboratorId}/destroy`;
+          fetch(destroyUrl, init).then(data => {
+            if(data.ok){
+              console.log(data.body);
+              return;
+            }
+            console.log(data.log);
+          }).catch(err => console.log(`Error: ${err}`));
+        }
+      }
+
+
+      dongles.forEach(dongle => dongle.addEventListener('change', handleAddAndRemoveCollaborator
+
+      ));
+    </script>
+
+    <% include ../static/partials/baseScripts.ejs %>
+  </body>
+</html>

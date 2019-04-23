@@ -4,6 +4,9 @@ module.exports = class ApplicationPolicy {
     this.record = record;
   }
 
+  _isCollaborator(){
+    return this.user && this.record.collaborators.filter(collaborator => collaborator.userId == this.user.id).length === 1;
+  }
   _isStandardUser(){
     return this.user && this.user.role == 0;
   }

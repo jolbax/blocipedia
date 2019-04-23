@@ -30,11 +30,12 @@ module.exports = {
         req.flash(err.type, err.message);
         res.redirect("/wikis");
       } else {
+        const authorizer = new Authorizer(req.user, wiki);
         let authorized;
         if (wiki.private) {
-          authorized = new Authorizer(req.user, wiki).editPrivate();
+          authorized = authorizer.editPrivate();
         } else {
-          authorized = new Authorizer(req.user, wiki).editPublic();
+          authorized = authorizer.editPublic();
         }
         if (!authorized) {
           req.flash("notice", "You are not authorized to do that");
