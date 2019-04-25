@@ -37,22 +37,47 @@ module.exports = {
     }
   },
   delete(req, res, next) {
-    wikiQueries.destroyWiki(req, (err, wiki) => {
-      if (err) {
-        req.flash(err.type, err.message);
-        res.redirect(`/wikis/${req.params.id}`);
-      } else {
-        req.flash("notice", `Wiki "${wiki.title}" has been deleted`);
-        res.redirect(`/wikis/`);
-      }
-    });
+    wikiQueries
+      .getWiki(req.params.id)
+      .then(wiki => {
+        const authorizer = new Authorizer(req.user, wiki);
+        let authorized;
+        if (!wiki) throw "Wiki not found";
+
+        if (wiki.private) {
+          authorized = authorizer.destroyPrivate();
+        } else {
+          authorized = authorizer.destroyPublic();
+        }
+
+        if (!authorized) {
+          req.flash("notice", "You are not authorized to do that");
+          res.redirect(`/wikis/${req.params.id}`);
+        } else {
+          wikiQueries
+            .destroyWiki(wiki)
+            .then(() => {
+              req.flash("notice", `Wiki "${wiki.title}" has been deleted`);
+              res.redirect(`/wikis/`);
+            })
+            .catch(err => {
+              console.log(err);
+              req.flash("error", err);
+              res.redirect("/");
+            });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        req.flash("error", err);
+        res.redirect("/");
+      });
   },
   edit(req, res, next) {
-    wikiQueries.getWiki(req.params.id, (err, wiki) => {
-      if (err) {
-        req.flash(err.type, err.message);
-        res.redirect("/wikis");
-      } else {
+    wikiQueries
+      .getWiki(req.params.id)
+      .then(wiki => {
+        if (!wiki) throw "Wiki not found";
         const authorizer = new Authorizer(req.user, wiki);
         let authorized;
         if (wiki.private) {
@@ -66,8 +91,11 @@ module.exports = {
         } else {
           res.render("wikis/edit", { wiki });
         }
-      }
-    });
+      })
+      .catch(err => {
+        req.flash("error", err);
+        res.redirect("/wikis");
+      });
   },
   index(req, res, next) {
     wikiQueries.getAllWikis((err, wikis) => {
@@ -84,22 +112,23 @@ module.exports = {
     res.render("wikis/new");
   },
   show(req, res, next) {
-    wikiQueries.getWiki(req.params.id, (err, wiki) => {
-      if (err) {
-        req.flash(err.type, err.message);
-        res.redirect("/wikis");
-      } else {
+    wikiQueries
+      .getWiki(req.params.id)
+      .then(wiki => {
+        if (!wiki) throw "Wiki not found";
         if (wiki.private) {
           const authorized = new Authorizer(req.user, wiki).showPrivate();
-
           if (!authorized) {
             req.flash("notice", "You are not authorized to do that");
             res.redirect("/wikis");
           }
         }
         res.render("wikis/show", { wiki, md });
-      }
-    });
+      })
+      .catch(err => {
+        req.flash("error", err);
+        res.redirect("/wikis");
+      });
   },
   update(req, res, next) {
     wikiQueries.updateWiki(req, (err, wiki) => {

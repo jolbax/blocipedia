@@ -4,48 +4,14 @@ const { Collaborator, User, Wiki } = require("../../src/db/models");
 module.exports = {
   createWiki(req) {
     return Wiki.create({
-        title: req.body.title,
-        body: req.body.body,
-        private: req.body.private || false,
-        userId: req.user.id
-      });
+      title: req.body.title,
+      body: req.body.body,
+      private: req.body.private || false,
+      userId: req.user.id
+    });
   },
-  destroyWiki(req, callback) {
-    if (!req.user) {
-      req.flash("notice", "You must be signed in to do that");
-      res.redirect("/");
-    } else {
-      return Wiki.findByPk(req.params.id).then(wiki => {
-        if (!wiki) {
-          callback({ type: "error", message: "Wiki was not found" });
-        }
-
-        const authorizer = new Authorizer(req.user, wiki);
-        let authorized;
-        if (wiki.private) {
-          authorized = authorizer.destroyPrivate();
-        } else {
-          authorized = authorizer.destroyPublic();
-        }
-
-        if (!authorized) {
-          callback({
-            type: "notice",
-            message: "You are not authorized to do that"
-          });
-        } else {
-          wiki
-            .destroy()
-            .then(res => {
-              callback(null, wiki);
-            })
-            .catch(err => {
-              console.log(err);
-              callback({ type: "error", message: err });
-            });
-        }
-      });
-    }
+  destroyWiki(wiki) {
+    return wiki.destroy();
   },
   getAllWikis(callback) {
     return Wiki.findAll({
@@ -62,17 +28,7 @@ module.exports = {
   getWiki(id, callback) {
     return Wiki.findByPk(id, {
       include: [{ model: Collaborator, as: "collaborators" }]
-    })
-      .then(wiki => {
-        if (!wiki) {
-          callback({ type: "error", message: "Wiki was not found" });
-        }
-        callback(null, wiki);
-      })
-      .catch(err => {
-        console.log(err);
-        callback({ type: "error", message: err });
-      });
+    });
   },
   updateWiki(req, callback) {
     if (!req.user) {
