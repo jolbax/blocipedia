@@ -2,34 +2,13 @@ const Authorizer = require("../policies/wiki");
 const { Collaborator, User, Wiki } = require("../../src/db/models");
 
 module.exports = {
-  createWiki(req, callback) {
-    if (!req.user) {
-      req.flash("notice", "You must be signed in to do that");
-      res.redirect("/");
-    } else {
-      if (req.body.private === true) {
-        const authorized = new Authorizer(req.user).newPrivate();
-        if (!authorized) {
-          return callback({
-            type: "notice",
-            message: "This is a premium feature. Please upgrade your account."
-          });
-        }
-      }
-      return Wiki.create({
+  createWiki(req) {
+    return Wiki.create({
         title: req.body.title,
         body: req.body.body,
         private: req.body.private || false,
         userId: req.user.id
-      })
-        .then(wiki => {
-          callback(null, wiki);
-        })
-        .catch(err => {
-          console.log(err);
-          callback({ type: "error", message: err });
-        });
-    }
+      });
   },
   destroyWiki(req, callback) {
     if (!req.user) {

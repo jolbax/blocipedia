@@ -4,14 +4,37 @@ const Authorizer = require("../policies/wiki");
 
 module.exports = {
   create(req, res, next) {
-    wikiQueries.createWiki(req, (err, wiki) => {
-      if (err) {
-        req.flash(err.type, err.message);
-        res.redirect("/wikis/new");
-      } else {
-        res.redirect(`/wikis/${wiki.id}`);
-      }
-    });
+    const authorizer = new Authorizer(req.user);
+    let authorized;
+    if (!req.user) {
+      req.flash("notice", "You must be signed in to do that");
+      res.redirect("/");
+    }
+
+    if (req.body.private == "true") {
+      authorized = authorizer.newPrivate();
+    } else if (req.body.private == "false" || !req.body.private) {
+      authorized = authorizer.newPublic();
+    }
+
+    if (!authorized) {
+      req.flash(
+        "notice",
+        "This is a premium feature. Please upgrade your account."
+      );
+      res.redirect("/");
+    } else {
+      wikiQueries
+        .createWiki(req)
+        .then(wiki => {
+          res.redirect(`/wikis/${wiki.id}`);
+        })
+        .catch(err => {
+          console.log(err);
+          req.flash(err.type, err.message);
+          res.redirect("/wikis/new");
+        });
+    }
   },
   delete(req, res, next) {
     wikiQueries.destroyWiki(req, (err, wiki) => {
