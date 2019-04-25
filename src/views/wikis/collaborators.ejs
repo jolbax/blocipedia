@@ -66,6 +66,7 @@
       const dongles = document.querySelectorAll('.custom-control-input');
       var init = {
         method: 'GET',
+        redirect: 'manual',
         credentials: 'same-origin' // This makes sure that the session is carried with
       };
 
@@ -74,19 +75,23 @@
           let createUrl = `/wikis/${this.dataset.wikiId}/collaborator/${this.dataset.collaboratorId}/create`;
           fetch(createUrl, init).then(data => {
             if(data.ok){
-              console.log(data.body);
+              console.log(data);
               return;
             }
-            console.log(data.log);
+            console.log(data);
+            alert("You are not allowed to do that!");
+            location.reload(true);
           }).catch(err => console.log(`Error: ${err}`));
         } else {
           let destroyUrl = `/wikis/${this.dataset.wikiId}/collaborator/${this.dataset.collaboratorId}/destroy`;
           fetch(destroyUrl, init).then(data => {
             if(data.ok){
-              console.log(data.body);
+              console.log(data);
               return;
             }
-            console.log(data.log);
+            console.log(data);
+            alert("You are not allowed to do that!");
+            location.reload(true);
           }).catch(err => console.log(`Error: ${err}`));
         }
       }
