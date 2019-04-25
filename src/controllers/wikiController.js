@@ -98,15 +98,17 @@ module.exports = {
       });
   },
   index(req, res, next) {
-    wikiQueries.getAllWikis((err, wikis) => {
-      if (err) {
-        console.log(err);
-        req.flash(err.type, err.message);
-        res.redirect(500, "/");
-      } else {
+    wikiQueries
+      .getAllWikis()
+      .then(wikis => {
+        if (!wikis) throw "No wikis found";
         res.render("wikis/index", { wikis });
-      }
-    });
+      })
+      .catch(err => {
+        console.log(err);
+        req.flash("error", err);
+        res.redirect(500, "/");
+      });
   },
   new(req, res, next) {
     res.render("wikis/new");
@@ -131,13 +133,50 @@ module.exports = {
       });
   },
   update(req, res, next) {
-    wikiQueries.updateWiki(req, (err, wiki) => {
-      if (err) {
-        req.flash(err.type, err.message);
-        res.redirect(`/wikis/${req.params.id}/edit`);
-      } else {
-        res.redirect(`/wikis/${wiki.id}`);
-      }
-    });
+    let updatedWiki = {
+      title: req.body.title,
+      body: req.body.body,
+      private: req.body.private || false
+    };
+    wikiQueries
+      .getWiki(req.params.id)
+      .then(wiki => {
+        if (!wiki) throw "Wiki not found";
+        const authorizer = new Authorizer(req.user, wiki);
+        let authorized;
+
+        if (wiki.private) {
+          authorized = authorizer.updatePrivate();
+          if (
+            authorizer._isCollaborator() &&
+            (!req.body.private || req.body.private == "false")
+          ) {
+            authorized = false;
+          }
+        } else {
+          authorized = authorizer.updatePublic(updatedWiki);
+        }
+
+        if (!authorized) {
+          req.flash("notice", "You are not authorized to do that");
+          res.redirect(`/wikis/${req.params.id}/edit`);
+        } else {
+          wikiQueries
+            .updateWiki(wiki, updatedWiki)
+            .then(wiki => {
+              res.redirect(`/wikis/${wiki.id}`);
+            })
+            .catch(err => {
+              console.log(err);
+              req.flash("error", err);
+              req.redirect("/");
+            });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        req.flash("error", err);
+        req.redirect("/");
+      });
   }
 };
