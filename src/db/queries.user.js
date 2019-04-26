@@ -12,6 +12,9 @@ module.exports = {
   getUser(id) {
     return User.findByPk(id, { include: [{ model: Wiki, as: "wikis" }] });
   },
+  getUsers() {
+    return User.findAll();
+  },
   updateUser(updatedUser, user) {
     return user.update(updatedUser, {fields: Object.keys(updatedUser)});
   },
