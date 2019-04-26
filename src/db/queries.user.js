@@ -1,5 +1,4 @@
-const User = require("../db/models").User;
-const Wiki = require("../db/models").Wiki;
+const { User, Wiki } = require("../db/models");
 
 module.exports = {
   createUser(user) {
@@ -16,7 +15,7 @@ module.exports = {
     return User.findAll();
   },
   updateUser(updatedUser, user) {
-    return user.update(updatedUser, {fields: Object.keys(updatedUser)});
+    return user.update(updatedUser, { fields: Object.keys(updatedUser) });
   },
   updateUserWikis(req, callback) {
     return this.getUser(req.user.id)

@@ -1,4 +1,3 @@
-const Authorizer = require("../policies/collaborator");
 const { Collaborator, User, Wiki } = require("./models");
 
 module.exports = {
