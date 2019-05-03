@@ -78,6 +78,8 @@ module.exports = {
         let authorized;
         if (wiki.private) {
           authorized = authorizer.showPrivate();
+        } else {
+          authorized = authorizer.show();
         }
         if (!authorized) {
           res
