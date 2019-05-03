@@ -75,11 +75,9 @@ module.exports = {
       .then(wiki => {
         if (!wiki) throw "Wiki not found";
         const authorizer = new Authorizer(req.user, wiki);
-        let authorized;
+        let authorized = authorizer.show();
         if (wiki.private) {
           authorized = authorizer.showPrivate();
-        } else {
-          authorized = authorizer.show();
         }
         if (!authorized) {
           res
