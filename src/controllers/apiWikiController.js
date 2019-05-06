@@ -62,18 +62,18 @@ module.exports = {
     wikiQueries
       .getAllWikis()
       .then(wikis => {
-        if (!wikis) throw "No wikis found";
+        if (!wikis) throw new Error("No wikis found");
         res.status(200).json({ wikis });
       })
       .catch(err => {
-        res.status(400).json({ error: err });
+        res.status(400).json({ error: err.message });
       });
   },
   getOne(req, res, next) {
     wikiQueries
       .getWiki(req.params.id)
       .then(wiki => {
-        if (!wiki) throw "Wiki not found";
+        if (!wiki) throw new Error("Wiki not found");
         const authorizer = new Authorizer(req.user, wiki);
         let authorized = authorizer.show();
         if (wiki.private) {
@@ -88,7 +88,7 @@ module.exports = {
         }
       })
       .catch(err => {
-        res.status(400).json({ error: err });
+        res.status(400).json({ error: err.message });
       });
   },
   update(req, res, next) {
@@ -100,7 +100,7 @@ module.exports = {
     wikiQueries
       .getWiki(req.params.id)
       .then(wiki => {
-        if (!wiki) throw "Wiki not found";
+        if (!wiki) throw new Error("Wiki not found");
         const authorizer = new Authorizer(req.user, wiki);
         let authorized;
 
@@ -134,7 +134,7 @@ module.exports = {
       })
       .catch(err => {
         console.log(err);
-        res.status(400).json({"error": err});
+        res.status(400).json({"error": err.message});
       });
   }
 };

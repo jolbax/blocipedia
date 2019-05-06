@@ -42,7 +42,7 @@ module.exports = {
       .then(wiki => {
         const authorizer = new Authorizer(req.user, wiki);
         let authorized;
-        if (!wiki) throw "Wiki not found";
+        if (!wiki) throw new Error("Wiki not found");
 
         if (wiki.private) {
           authorized = authorizer.destroyPrivate();
@@ -69,7 +69,7 @@ module.exports = {
       })
       .catch(err => {
         console.log(err);
-        req.flash("error", err);
+        req.flash("error", err.message);
         res.redirect("/");
       });
   },
@@ -77,7 +77,7 @@ module.exports = {
     wikiQueries
       .getWiki(req.params.id)
       .then(wiki => {
-        if (!wiki) throw "Wiki not found";
+        if (!wiki) throw new Error("Wiki not found");
         const authorizer = new Authorizer(req.user, wiki);
         let authorized;
         if (wiki.private) {
@@ -93,7 +93,7 @@ module.exports = {
         }
       })
       .catch(err => {
-        req.flash("error", err);
+        req.flash("error", err.message);
         res.redirect("/wikis");
       });
   },
@@ -101,12 +101,12 @@ module.exports = {
     wikiQueries
       .getAllWikis()
       .then(wikis => {
-        if (!wikis) throw "No wikis found";
+        if (!wikis) throw new Error("No wikis found");
         res.render("wikis/index", { wikis });
       })
       .catch(err => {
-        console.log(err);
-        req.flash("error", err);
+        console.log(err.message);
+        req.flash("error", err.message);
         res.redirect(500, "/");
       });
   },
@@ -117,7 +117,7 @@ module.exports = {
     wikiQueries
       .getWiki(req.params.id)
       .then(wiki => {
-        if (!wiki) throw "Wiki not found";
+        if (!wiki) throw new Error("Wiki not found");
         if (wiki.private) {
           const authorized = new Authorizer(req.user, wiki).showPrivate();
           if (!authorized) {
@@ -128,7 +128,7 @@ module.exports = {
         res.render("wikis/show", { wiki, md });
       })
       .catch(err => {
-        req.flash("error", err);
+        req.flash("error", err.message);
         res.redirect("/wikis");
       });
   },
@@ -141,7 +141,7 @@ module.exports = {
     wikiQueries
       .getWiki(req.params.id)
       .then(wiki => {
-        if (!wiki) throw "Wiki not found";
+        if (!wiki) throw new Error("Wiki not found");
         const authorizer = new Authorizer(req.user, wiki);
         let authorized;
 
@@ -174,8 +174,8 @@ module.exports = {
         }
       })
       .catch(err => {
-        console.log(err);
-        req.flash("error", err);
+        console.log(err.message);
+        req.flash("error", err.message);
         req.redirect("/");
       });
   }

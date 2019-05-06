@@ -13,12 +13,19 @@ module.exports = {
       req.flash("notice", "You are not authorized to do that");
       res.redirect("/");
     } else {
-      if (req.body.password === req.body.passwordConfirmation) {
-        const salt = bcrypt.genSaltSync();
-        hashedPassword = bcrypt.hashSync(req.body.password, salt);
-      } else {
-        throw "Password does not match confirmation";
+      try {
+        if (req.body.password === req.body.passwordConfirmation) {
+          const salt = bcrypt.genSaltSync();
+          hashedPassword = bcrypt.hashSync(req.body.password, salt);
+        } else {
+          throw new Error("Password does not match confirmation");
+        }
+      } catch (error) {
+        req.flash("error", error.message);
+        res.redirect("/users/sign_up");
+        return;
       }
+
       let newUser = {
         username: req.body.username ? req.body.username.toLowerCase() : null,
         email: req.body.email ? req.body.email.toLowerCase() : null,
@@ -171,11 +178,11 @@ module.exports = {
             password: bcrypt.hashSync(req.body.password, salt)
           };
         } else {
-          throw "Password does not match confirmation";
+          throw new Error("Password does not match confirmation");
         }
 
         const authorized = new Authorizer(req.user, user).update();
-        if (!authorized) throw "You are not authorized to do that";
+        if (!authorized) throw new Error("You are not authorized to do that");
         userQueries
           .updateUser(hashedPassword, user)
           .then(user => {
@@ -187,14 +194,14 @@ module.exports = {
             res.redirect("/");
           })
           .catch(err => {
-            console.log(err);
-            req.flash("error", err);
+            console.log(err.message);
+            req.flash("error", err.message);
             res.redirect("/users/profile/edit");
           });
       })
       .catch(err => {
-        console.log(err);
-        req.flash("error", err);
+        console.log(err.message);
+        req.flash("error", err.message);
         res.redirect("/users/profile/edit");
       });
   },

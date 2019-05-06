@@ -12,7 +12,7 @@ module.exports = {
       const salt = bcrypt.genSaltSync();
       hashedPassword = bcrypt.hashSync(req.body.password, salt);
     } else {
-      throw "Password does not match confirmation";
+      throw new Error("Password does not match confirmation");
     }
     let newUser = {
       username: req.body.username ? req.body.username.toLowerCase() : null,
@@ -26,7 +26,7 @@ module.exports = {
         mailer.sendConfirmation(user, mailer.noReplyAddress);
       })
       .catch(err => {
-        res.status(400).json({ error: err });
+        res.status(400).json({ error: err.message });
       });
   },
   apiLogin(req, res, next) {
@@ -58,27 +58,25 @@ module.exports = {
             password: bcrypt.hashSync(req.body.password, salt)
           };
         } else {
-          throw "Password does not match confirmation";
+          throw new Error("Password does not match confirmation");
         }
 
         const authorized = new Authorizer(req.user, user).update();
         console.log(authorized);
-        console.log(req.user);
 
-
-        if (!authorized) throw "You are not authorized to do that";
+        if (!authorized) throw new Error("You are not authorized to do that");
         userQueries
           .updateUser(hashedPassword, user)
           .then(user => {
             res.json({ status: "ok" });
           })
           .catch(err => {
-            res.json({ status: "failed", message: err });
+            res.json({ status: "failed", message: err.message });
           });
       })
       .catch(err => {
         console.log(err);
-        res.json({ status: "failed", message: err });
+        res.json({ status: "failed", message: err.message });
       });
   }
 };

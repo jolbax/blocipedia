@@ -28,11 +28,7 @@ module.exports = {
       .getCollaborator(req.params.userId, req.params.wikiId)
       .then(collaborator => {
         if (collaborator) {
-          throw {
-            type: "error",
-            message:
-              "There is already a collaborator associated with this user and wiki"
-          };
+          throw new Error("There is already a collaborator associated with this user and wiki");
         } else {
           wikiQueries
             .getWiki(req.params.wikiId)
@@ -55,7 +51,7 @@ module.exports = {
       })
       .catch(err => {
         console.log(err);
-        req.flash(err.type, err.message);
+        req.flash("error", err.message);
         res.redirect("/");
       });
   },
@@ -68,18 +64,13 @@ module.exports = {
           req.flash("notice", "You are not authorized to do that");
           res.redirect("/");
         } else {
-          collaboratorQueries
-            .getCollaborator(req.params.userId, wiki.id)
-            .then(collaborator => {
-              if (!collaborator) throw "Collaborator not found";
-              collaboratorQueries
-                .deleteCollaborator(collaborator)
-                .then(() => {
-                  res.json({status: "ok"});
-                })
-                .catch(err => console.log(err));
-            })
-            .catch(err => console.log(err));
+          collaboratorQueries.deleteCollaborator(req.params.userId, wiki.id)
+          .then(count => {
+            res.json({status: "ok", message: `${count} collaborator/s deleted`});
+          })
+          .catch(err => {
+            console.log(err);
+          })
         }
       })
       .catch(err => console.log(err));
