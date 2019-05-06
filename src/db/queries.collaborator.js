@@ -7,8 +7,8 @@ module.exports = {
         wikiId: wikiId
       });
   },
-  deleteCollaborator(collaborator) {
-    return collaborator.destroy();
+  deleteCollaborator(userId, wikiId){
+    return Collaborator.destroy({where: { userId, wikiId }})
   },
   getCollaborator(userId, wikiId) {
     return Collaborator.findOne({
