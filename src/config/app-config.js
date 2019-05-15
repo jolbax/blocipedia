@@ -1,10 +1,18 @@
 require("dotenv").config();
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const flash = require("express-flash");
 const passportConfig = require("./passport-config");
 const path = require("path");
 const session = require("express-session");
 const viewsFolder = path.join(__dirname, "..", "views");
+
+const corsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
 
 module.exports = {
   init(app, express) {
@@ -34,5 +42,6 @@ module.exports = {
       next();
     });
     app.use(express.static(path.join(__dirname, "..", "assets")));
+    app.use(cors(corsOptions));
   }
 };
